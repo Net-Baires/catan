@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Catan.Tests
 {
@@ -7,13 +9,20 @@ namespace Catan.Tests
         public Vertex Up { get; set; }
         public Vertex Down { get; set; }
         public Road Road { get; private set; }
-        public Edge(Field current, Field right, Field up, Field down)
+
+
+        private static ConcurrentDictionary<string, Edge> _edges = new ConcurrentDictionary<string, Edge>();
+
+        public static Edge Create(Vertex up, Vertex down)
         {
-            this.Up = new Vertex { Field1 = current, Field2 = right, Field3 = up };
-            this.Down = new Vertex { Field1 = current, Field2 = down, Field3 = right };
+            var key = $"{up}|{down}";
+            var edge = new Edge(up, down);
+            return _edges.GetOrAdd(key, edge);
+
+
         }
 
-        public Edge(Vertex up, Vertex down)
+        private Edge(Vertex up, Vertex down)
         {
             this.Up = up;
             this.Down = down;

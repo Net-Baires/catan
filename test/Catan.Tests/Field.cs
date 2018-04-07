@@ -4,6 +4,8 @@ namespace Catan.Tests
 {
     public class Field
     {
+        private readonly int _number;
+
         public Edge Edge1 { get; private set; }
         public Edge Edge2 { get; private set; }
         public Edge Edge3 { get; private set; }
@@ -11,9 +13,9 @@ namespace Catan.Tests
         public Edge Edge5 { get; private set; }
         public Edge Edge6 { get; private set; }
         public Token Token { get; private set; }
-        public Field()
+        public Field(int number)
         {
-
+            _number = number;
         }
 
         public void Build(
@@ -25,28 +27,43 @@ namespace Catan.Tests
             Field field6,
             Func<Token> generateToken)
         {
-            this.Edge1 = new Edge(this, field1, field2, field6);
-            field1.Edge4 = this.Edge1;
 
-            this.Edge2 = new Edge(new Vertex
-            {
-                Field1 = this,
-                Field2 = field2,
-                Field3 = field3
-            }, this.Edge1.Up);
+            this.Edge1 = Edge.Create(
+                Vertex.Create(this, field1, field2),
+                Vertex.Create(this, field6, field1));
 
-            field2.Edge5 = this.Edge2;
 
-            this.Edge3 = new Edge(new Vertex
-            {
-                Field1 = this,
-                Field2 = field3,
-                Field3 = field4
-            }, this.Edge2.Up);
+            this.Edge2 = Edge.Create(
+                Vertex.Create(field3, this, field2),
+                Vertex.Create(this, field1, field2)
+            );
 
-            field3.Edge6 = this.Edge3;
+
+            this.Edge3 = Edge.Create(
+                Vertex.Create(field3, this, field2),
+                Vertex.Create(field4, this, field3));
+
+            this.Edge4 = Edge.Create(
+                Vertex.Create(field4, this, field3),
+                Vertex.Create(field4, field5, this));
+
+            this.Edge5 = Edge.Create(
+                Vertex.Create(field4, field5, this),
+                Vertex.Create(field5, field6, this)
+                );
+
+            this.Edge6 = Edge.Create(
+                Vertex.Create(this, field6, field1),
+                Vertex.Create(field5,field6,this)
+                );
+
 
             Token = generateToken();
+        }
+
+        public override string ToString()
+        {
+            return $"Field {_number}";
         }
     }
     public class Token
